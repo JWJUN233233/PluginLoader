@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "FL/aiS+YHo7qwTrT9tdU78LBM7ue09qlc8UWmL2t8waF4i5L5Bet03gN6rMTEmE4dxCyzWPj/YUs+MJqAn4HNA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\rdc_api\\source\\repos\\PluginLoader\\PluginLoader.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Ddggd\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
