@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,8 +15,9 @@ namespace PluginLoader
         {
             Event.RegListener(this);
         }
-        public virtual PluginInfo PluginInfo { get; set; }
-        public virtual Event GetEvent(Event @event) { return @event;  }
+        public abstract PluginInfo PluginInfo { get; set; }
+        public virtual void GetEvent(Event @event) {}
     }
 
 }
+

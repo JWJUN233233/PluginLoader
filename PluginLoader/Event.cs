@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 namespace PluginLoader
 {
     /// <summary>
@@ -12,18 +7,11 @@ namespace PluginLoader
     public abstract class Event
     {
         /// <summary>
-        /// 是否取消
-        /// </summary>
-        public bool IsCancel;
-        /// <summary>
         /// 所有插件监听器
         /// </summary>
         public static List<Listener> Listeners = new List<Listener>();
-        public virtual string Name { get; }
-        public virtual void Do(bool IsCancel)
-        {
-
-        }
+        public abstract string Name { get; }
+        public abstract bool Do();
         public string GetEventName()
         {
             return Name;
@@ -38,40 +26,60 @@ namespace PluginLoader
         {
             Listeners.Add(listener);
         }/// <summary>
-        /// 发送全局事件
-        /// </summary>
-        /// <param name="event">
-        /// 事件
-        /// </param>
-        public static void SetEvent(Event @event)
+         /// 发送全局事件
+         /// </summary>
+         /// <param name="event">
+         /// 事件
+         /// </param>
+        public static bool CallEvent(Event @event)
         {
             bool cancel = false;
-            for(int i = 0; i < Listeners.Count; i++)
+            for (int i = 0; i < Listeners.Count; i++)
             {
-                Event e = Listeners[i].GetEvent(@event);
-                cancel = cancel && e.IsCancel;
-                MethodInfo[] methods = Listeners[i].GetType().GetMethods();
-                foreach(MethodInfo method in methods)
+                Listeners[i].GetEvent(@event);
+                if (@event is ICancellable)
                 {
+                    cancel = cancel || ((ICancellable)@event).IsCanceled;
+                }
+                MethodInfo[] methods = Listeners[i].GetType().GetMethods();
+                bool IsContinue;
+                foreach (MethodInfo method in methods)
+                {
+                    IsContinue = false;
                     bool IsEventMethod = false;
-                    foreach(Attribute attribute in method.GetCustomAttributes())
+                    foreach (Attribute attribute in method.GetCustomAttributes())
                     {
-                        if(attribute.GetType().Name == "EventHandle")
+                        if (attribute is EventHandler)
                         {
                             IsEventMethod = true;
+                            if (((EventHandler)attribute).IgnoreCancelled & cancel)
+                            {
+                                IsContinue = true;
+                            }
                         }
                     }
-                    if (IsEventMethod & method.GetParameters().Length == 1)
+                    if (IsEventMethod && method.GetParameters().Length == 1)
                     {
-                        if(method.GetParameters()[0].ParameterType.BaseType.Name == "Event" & method.GetParameters()[0].ParameterType.Name == @event.GetType().Name & method.ReturnType.BaseType.Name == "Event")
+                        Type? baseType = method.GetParameters()[0].ParameterType.BaseType;
+                        if (baseType != null)
                         {
-                            e = (Event)method.Invoke(Listeners[i], new object[] {@event });
-                            cancel = cancel && e.IsCancel;
+                            while (baseType.BaseType != null && baseType != typeof(Event))
+                            {
+                                baseType = baseType.BaseType;
+                            }
+                        }
+                        if (!IsContinue && baseType == typeof(Event) && method.GetParameters()[0].ParameterType == @event.GetType())
+                        {
+                            method.Invoke(Listeners[i], new object[] { @event });
+                            if (@event is ICancellable)
+                            {
+                                cancel = cancel || ((ICancellable)@event).IsCanceled;
+                            }
                         }
                     }
                 }
             }
-            @event.Do(cancel);
+            return @event.Do();
         }
     }
 }

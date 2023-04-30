@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace PluginLoader
 {
-    public class GuidExpection : Exception
+    [AttributeUsage(AttributeTargets.Class)]
+    public class RunnableHandler : Attribute
     {
 
     }

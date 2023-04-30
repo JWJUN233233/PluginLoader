@@ -1,11 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace PluginLoader
 {
     /// <summary>
@@ -13,25 +5,37 @@ namespace PluginLoader
     /// </summary>
     public class PluginInfo
     {
-        public string Guid;
-        public string Name;
+        /// <summary>
+        /// 插件作者
+        /// </summary>
+        public string Author = string.Empty;
+        /// <summary>
+        /// 插件图标
+        /// </summary>
+        public string? Icon;
+        /// <summary>
+        /// 插件Guid
+        /// </summary>
+        public string Guid = string.Empty;
+        /// <summary>
+        /// 插件名
+        /// </summary>
+        public string Name = string.Empty;
+        /// <summary>
+        /// 插件描述
+        /// </summary>
         public string? Description;
-
-        public static explicit operator PluginInfo(Plugin v)
-        {
-            PluginInfo? pluginInfo = PluginLoader.GetPluginInfo(v);
-            if(pluginInfo != null)
-            {
-                if(pluginInfo.MainType == new EmptyPlugin(null).GetType())
-                {
-                    pluginInfo.Guid = ((EmptyPlugin)v).Flag;
-                }
-            }
-            return pluginInfo;
-        }
-
-        public string? Version;
-        public string Path;
-        public Type? MainType;
+        /// <summary>
+        /// 插件版本
+        /// </summary>
+        public string Version = string.Empty;
+        /// <summary>
+        /// 插件路径
+        /// </summary>
+        public string Path = string.Empty;
+        /// <summary>
+        /// 插件主类
+        /// </summary>
+        public Type MainType;
     }
 }
